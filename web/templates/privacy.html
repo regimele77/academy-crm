@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="page">
+    <div class="wrap">
+      <h1>Privacy policy</h1>
+      <p class="lead">This policy explains what the Academy CRM website does with information you give it.</p>
+
+      <h2>Contact form</h2>
+      <p>The form asks for your name, email address, and message. The site uses them to show your confirmation on the page. It does not save the message in a database, and it does not send it by email.</p>
+
+      <h2>Cookies</h2>
+      <p>Sending the form needs a CSRF cookie. That cookie checks the form came from this site. It is not used for advertising.</p>
+
+      <h2>Fonts</h2>
+      <p>Pages load the Prompt font from Google Fonts. Your browser contacts Google to download the font files.</p>
+
+      <h2>Questions</h2>
+      <p>Questions about this policy can be sent from the <a href="{% url 'contact' %}">contact page</a>. The <a href="{% url 'terms' %}">terms and conditions</a> cover use of the site.</p>
+      <p class="updated">Last updated 23 October 2026.</p>
+    </div>
+  </section>
+{% endblock %}

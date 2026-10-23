@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{% block meta_description %}{{ description }}{% endblock %}">
+  <meta name="theme-color" content="#086288">
+  <title>{% block title %}{{ title }}{% endblock %}</title>
+  <link rel="icon" href="{% static 'web/logo.jpg' %}" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'web/css/landing.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{% url 'home' %}">
+        <img src="{% static 'web/logo.jpg' %}" alt="" width="48" height="48">
+        <span>Academy CRM</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="sr-only">Menu</span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a href="{% url 'home' %}" {% if page == 'home' %}aria-current="page"{% endif %}>Home</a>
+        <a href="{% url 'about' %}" {% if page == 'about' %}aria-current="page"{% endif %}>About</a>
+        <a href="{% url 'contact' %}" {% if page == 'contact' %}aria-current="page"{% endif %}>Book a demo</a>
+      </nav>
+    </div>
+  </header>
+  <main id="content">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <nav aria-label="Footer">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'contact' %}">Contact</a>
+        <a href="{% url 'terms' %}" {% if page == 'terms' %}aria-current="page"{% endif %}>Terms</a>
+        <a href="{% url 'privacy' %}" {% if page == 'privacy' %}aria-current="page"{% endif %}>Privacy</a>
+      </nav>
+      <p class="fine-print">© {% now "Y" %}</p>
+    </div>
+  </footer>
+  <script src="{% static 'web/js/nav.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="page">
+    <div class="wrap">
+      <h1>Terms and conditions</h1>
+      <p class="lead">These terms cover use of the Academy CRM website.</p>
+
+      <h2>The site</h2>
+      <p>Academy CRM describes a record for students, classes, and attendance. The pages on this site are for information and for sending a message.</p>
+
+      <h2>Messages</h2>
+      <p>The contact form is for a name, an email address, and a short message. Do not send student records or other sensitive information through it.</p>
+
+      <h2>Acceptable use</h2>
+      <p>Use the site lawfully. Do not try to disrupt it, break into it, or reach information that is not yours.</p>
+
+      <h2>Changes</h2>
+      <p>We may update these terms on this page. The <a href="{% url 'privacy' %}">privacy policy</a> explains how messages are handled.</p>
+      <p class="updated">Last updated 23 October 2026.</p>
+    </div>
+  </section>
+{% endblock %}
