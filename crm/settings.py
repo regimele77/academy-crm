@@ -37,7 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'web'
+    'web',
+    'authentication',
+    'course',
+    'student',
+    'instructor'
 ]
 
 MIDDLEWARE = [
@@ -99,6 +103,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'authentication.CRMUserModel'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/

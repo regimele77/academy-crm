@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign in · Academy CRM{% endblock %}
+{% block meta_description %}Sign in to your Academy CRM workspace.{% endblock %}
+
+{% block content %}
+  <section class="section login-section" aria-labelledby="login-heading">
+    <div class="wrap login-shell">
+      <div class="login-copy">
+        <p class="eyebrow">Welcome back</p>
+        <h1 id="login-heading">Sign in to your academy.</h1>
+        <p>Use your work email to access students, classes, and attendance in one calm workspace.</p>
+        <ul>
+          <li><span aria-hidden="true">✓</span> Secure staff access</li>
+          <li><span aria-hidden="true">✓</span> Shared team workspace</li>
+          <li><span aria-hidden="true">✓</span> Pick up where you left off</li>
+        </ul>
+      </div>
+
+      <form class="form form-card" id="login-form" method="post" action="{% url 'login' %}" novalidate>
+        {% csrf_token %}
+
+        {% if messages %}
+          {% for message in messages %}
+            <p
+              class="notice {% if message.tags == 'error' %}notice-error{% endif %}"
+              id="form-status"
+              tabindex="-1"
+              role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}"
+            >{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+
+        <div class="field" data-field="email">
+          <label for="email">Work email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            required
+            placeholder="alex@youracademy.com"
+            value="{{ request.POST.email|default:'' }}"
+          >
+          <p class="field-error" id="email-error" hidden></p>
+        </div>
+
+        <div class="field" data-field="password">
+          <label for="password">Password</label>
+          <div class="password-field">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              placeholder="Enter your password"
+              minlength="8"
+            >
+            <button
+              class="password-toggle"
+              type="button"
+              aria-controls="password"
+              aria-pressed="false"
+              data-show-label="Show password"
+              data-hide-label="Hide password"
+            >
+              <span class="sr-only">Show password</span>
+            </button>
+          </div>
+          <p class="field-error" id="password-error" hidden></p>
+        </div>
+
+        <button class="btn btn-primary" type="submit">
+          Sign in
+          <span aria-hidden="true">→</span>
+        </button>
+        <p class="form-note">Having trouble? Contact your academy administrator.</p>
+      </form>
+    </div>
+  </section>
+{% endblock %}
+
+{% block extra_body %}
+  <script src="{% static 'web/js/login.js' %}"></script>
+{% endblock %}
