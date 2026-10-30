@@ -61,9 +61,19 @@
 
       <div class="sidebar-footer">
         <div class="sidebar-user">
-          <span class="sidebar-avatar" aria-hidden="true">
-            {{ request.student.user.first_name|slice:":1" }}{{ request.student.user.last_name|slice:":1" }}
-          </span>
+          {% if request.student.user.profile_picture %}
+            <img
+              class="sidebar-avatar sidebar-avatar-image"
+              src="{{ request.student.user.profile_picture.url }}"
+              alt=""
+              width="40"
+              height="40"
+            >
+          {% else %}
+            <span class="sidebar-avatar" aria-hidden="true">
+              {{ request.student.user.first_name|slice:":1" }}{{ request.student.user.last_name|slice:":1" }}
+            </span>
+          {% endif %}
           <div>
             <strong>{{ request.student.user.first_name }} {{ request.student.user.last_name }}</strong>
             <span>{{ request.student.register_number }}</span>

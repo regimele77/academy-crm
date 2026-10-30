@@ -1,8 +1,11 @@
 from decimal import Decimal
 
+from django.contrib import messages
 from django.db.models import Avg, Prefetch
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_http_methods
 
+from authentication.forms import ContactProfileForm
 from course.models import CourseGroupModel
 
 from .decorators import student_required
@@ -56,6 +59,7 @@ def student_dashboard(request):
 
 
 @student_required
+@require_http_methods(['GET', 'POST'])
 def student_profile(request):
     student = (
         StudentModel.objects
@@ -72,6 +76,15 @@ def student_profile(request):
         .get(pk=request.student.pk, user=request.user)
     )
 
+    if request.method == 'POST':
+        form = ContactProfileForm(request.POST, request.FILES, instance=student.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your contact details were updated.')
+            return redirect('student_profile')
+    else:
+        form = ContactProfileForm(instance=student.user)
+
     grades = StudentGradeModel.objects.filter(student=request.user)
     average_grade = grades.aggregate(average=Avg('grade'))['average']
     grade_count = grades.count()
@@ -82,6 +95,7 @@ def student_profile(request):
 
     context = {
         'student': student,
+        'form': form,
         'groups': groups,
         'grade_count': grade_count,
         'average_grade': average_grade,

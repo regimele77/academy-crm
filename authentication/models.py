@@ -10,7 +10,8 @@ class CRMUserModel(AbstractUser):
 
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    phone = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255, unique=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

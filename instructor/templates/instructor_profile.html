@@ -8,44 +8,67 @@
 {% endblock %}
 
 {% block content %}
-  <section class="panel profile-hero" aria-labelledby="profile-name">
-    <div class="profile-hero-main">
-      <span class="profile-avatar" aria-hidden="true">
-        {{ instructor.user.first_name|slice:":1" }}{{ instructor.user.last_name|slice:":1" }}
-      </span>
-      <div>
-        <p class="eyebrow">Instructor</p>
-        <h2 id="profile-name">{{ instructor.user.first_name }} {{ instructor.user.last_name }}</h2>
-        <p class="profile-subtitle">{{ instructor.user.email }}</p>
+  <div class="profile-top">
+    <section class="panel profile-hero" aria-labelledby="profile-name">
+      <div class="profile-hero-main">
+        <label
+          class="profile-avatar-trigger"
+          for="{{ form.profile_picture.id_for_label }}"
+          title="Change profile picture"
+        >
+          {% if instructor.user.profile_picture %}
+            <img
+              class="profile-avatar profile-avatar-image"
+              src="{{ instructor.user.profile_picture.url }}"
+              alt=""
+              width="64"
+              height="64"
+              data-profile-hero-image
+            >
+          {% else %}
+            <span class="profile-avatar" aria-hidden="true" data-profile-hero-initials>
+              {{ instructor.user.first_name|slice:":1" }}{{ instructor.user.last_name|slice:":1" }}
+            </span>
+          {% endif %}
+          <span class="profile-avatar-overlay" aria-hidden="true">
+            <i class="fa fa-camera"></i>
+          </span>
+          <span class="sr-only">Upload a new profile picture</span>
+        </label>
+        <div>
+          <p class="eyebrow">Instructor</p>
+          <h2 id="profile-name">{{ instructor.user.first_name }} {{ instructor.user.last_name }}</h2>
+          <p class="profile-subtitle">{{ instructor.user.email }}</p>
+        </div>
       </div>
-    </div>
-    {% if instructor.description %}
-      <p class="profile-about">{{ instructor.description }}</p>
-    {% endif %}
-  </section>
+      {% if instructor.description %}
+        <p class="profile-about">{{ instructor.description }}</p>
+      {% endif %}
+    </section>
 
-  <section class="stat-grid" aria-label="Teaching summary">
-    <article class="stat-card">
-      <small>Courses</small>
-      <b>{{ course_count }}</b>
-      <em>Assigned to you</em>
-    </article>
-    <article class="stat-card">
-      <small>Groups</small>
-      <b>{{ group_count }}</b>
-      <em>{{ active_groups_count }} active now</em>
-    </article>
-    <article class="stat-card">
-      <small>Students</small>
-      <b>{{ enrolled_students_count }}</b>
-      <em>Across your groups</em>
-    </article>
-    <article class="stat-card">
-      <small>Salary</small>
-      <b>{{ instructor.salary }}</b>
-      <em>Recorded on your account</em>
-    </article>
-  </section>
+    <section class="stat-grid profile-stat-grid" aria-label="Teaching summary">
+      <article class="stat-card">
+        <small>Courses</small>
+        <b>{{ course_count }}</b>
+        <em>Assigned to you</em>
+      </article>
+      <article class="stat-card">
+        <small>Groups</small>
+        <b>{{ group_count }}</b>
+        <em>{{ active_groups_count }} active now</em>
+      </article>
+      <article class="stat-card">
+        <small>Students</small>
+        <b>{{ enrolled_students_count }}</b>
+        <em>Across your groups</em>
+      </article>
+      <article class="stat-card">
+        <small>Salary</small>
+        <b>{{ instructor.salary }}</b>
+        <em>Recorded on your account</em>
+      </article>
+    </section>
+  </div>
 
   <div class="dashboard-grid">
     <section class="panel" aria-labelledby="account-heading">
@@ -55,24 +78,96 @@
           <h2 id="account-heading">Account details</h2>
         </div>
       </div>
-      <dl class="detail-list">
-        <div>
-          <dt>First name</dt>
-          <dd>{{ instructor.user.first_name }}</dd>
+
+      <form class="crm-form" method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="form-errors" role="alert">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="field-grid">
+          <div class="field {% if form.first_name.errors %}has-error{% endif %}">
+            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+            {{ form.first_name }}
+            {% for error in form.first_name.errors %}
+              <p class="field-error">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <div class="field {% if form.last_name.errors %}has-error{% endif %}">
+            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+            {% for error in form.last_name.errors %}
+              <p class="field-error">{{ error }}</p>
+            {% endfor %}
+          </div>
         </div>
-        <div>
-          <dt>Last name</dt>
-          <dd>{{ instructor.user.last_name }}</dd>
+
+        <div class="field {% if form.email.errors %}has-error{% endif %}">
+          <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+          {{ form.email }}
+          {% for error in form.email.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
         </div>
-        <div>
-          <dt>Email</dt>
-          <dd>{{ instructor.user.email }}</dd>
+
+        <div class="field {% if form.phone.errors %}has-error{% endif %}">
+          <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+          {{ form.phone }}
+          {% for error in form.phone.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
         </div>
-        <div>
-          <dt>Phone</dt>
-          <dd>{{ instructor.user.phone }}</dd>
+
+        <div class="field {% if form.profile_picture.errors %}has-error{% endif %}">
+          <span class="field-label">{{ form.profile_picture.label }}</span>
+          <div
+            class="profile-upload{% if form.profile_picture.errors %} has-error{% endif %}"
+            data-profile-dropzone
+          >
+            <div class="profile-upload-preview" data-profile-preview>
+              {% if instructor.user.profile_picture %}
+                <img
+                  src="{{ instructor.user.profile_picture.url }}"
+                  alt="Current profile picture"
+                  data-profile-preview-image
+                >
+              {% else %}
+                <span class="profile-upload-initials" data-profile-preview-initials aria-hidden="true">
+                  {{ instructor.user.first_name|slice:":1" }}{{ instructor.user.last_name|slice:":1" }}
+                </span>
+              {% endif %}
+            </div>
+            <div class="profile-upload-copy">
+              <p class="profile-upload-title">Drag and drop a photo here</p>
+              <p class="profile-upload-hint">JPEG, PNG, WebP or GIF · up to 5 MB</p>
+              <label class="btn btn-ghost btn-sm profile-upload-browse" for="{{ form.profile_picture.id_for_label }}">
+                Choose file
+              </label>
+              <p class="profile-upload-filename" data-profile-filename>
+                {% if instructor.user.profile_picture %}
+                  {{ instructor.user.profile_picture.name|cut:"profile_pictures/" }}
+                {% else %}
+                  No file selected
+                {% endif %}
+              </p>
+            </div>
+            {{ form.profile_picture }}
+          </div>
+          {% for error in form.profile_picture.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
         </div>
-      </dl>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
     </section>
 
     <section class="panel" aria-labelledby="employment-heading">

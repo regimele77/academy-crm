@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
+from authentication.forms import ContactProfileForm
 from course.models import CourseGroupModel, CourseModel
 from student.models import StudentGradeModel, StudentModel
 
@@ -503,9 +504,19 @@ def instructor_delete_group(request, group_id):
 
 
 @instructor_required
+@require_http_methods(['GET', 'POST'])
 def instructor_profile(request):
     instructor = _scoped_instructor(request)
     today = timezone.localdate()
+
+    if request.method == 'POST':
+        form = ContactProfileForm(request.POST, request.FILES, instance=instructor.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your contact details were updated.')
+            return redirect('instructor_profile')
+    else:
+        form = ContactProfileForm(instance=instructor.user)
 
     course_count = _instructor_courses_qs(instructor).count()
     group_count = _instructor_groups_qs(instructor).count()
@@ -523,6 +534,7 @@ def instructor_profile(request):
 
     context = {
         'instructor': instructor,
+        'form': form,
         'course_count': course_count,
         'group_count': group_count,
         'active_groups_count': active_groups_count,

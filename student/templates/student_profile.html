@@ -8,41 +8,64 @@
 {% endblock %}
 
 {% block content %}
-  <section class="panel profile-hero" aria-labelledby="profile-name">
-    <div class="profile-hero-main">
-      <span class="profile-avatar" aria-hidden="true">
-        {{ student.user.first_name|slice:":1" }}{{ student.user.last_name|slice:":1" }}
-      </span>
-      <div>
-        <p class="eyebrow">Student</p>
-        <h2 id="profile-name">{{ student.user.first_name }} {{ student.user.last_name }}</h2>
-        <p class="profile-subtitle">{{ student.register_number }} · {{ student.user.email }}</p>
+  <div class="profile-top">
+    <section class="panel profile-hero" aria-labelledby="profile-name">
+      <div class="profile-hero-main">
+        <label
+          class="profile-avatar-trigger"
+          for="{{ form.profile_picture.id_for_label }}"
+          title="Change profile picture"
+        >
+          {% if student.user.profile_picture %}
+            <img
+              class="profile-avatar profile-avatar-image"
+              src="{{ student.user.profile_picture.url }}"
+              alt=""
+              width="64"
+              height="64"
+              data-profile-hero-image
+            >
+          {% else %}
+            <span class="profile-avatar" aria-hidden="true" data-profile-hero-initials>
+              {{ student.user.first_name|slice:":1" }}{{ student.user.last_name|slice:":1" }}
+            </span>
+          {% endif %}
+          <span class="profile-avatar-overlay" aria-hidden="true">
+            <i class="fa fa-camera"></i>
+          </span>
+          <span class="sr-only">Upload a new profile picture</span>
+        </label>
+        <div>
+          <p class="eyebrow">Student</p>
+          <h2 id="profile-name">{{ student.user.first_name }} {{ student.user.last_name }}</h2>
+          <p class="profile-subtitle">{{ student.register_number }} · {{ student.user.email }}</p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="stat-grid" aria-label="Study summary">
-    <article class="stat-card">
-      <small>Active groups</small>
-      <b>{{ groups|length }}</b>
-      <em>Courses you are enrolled in</em>
-    </article>
-    <article class="stat-card">
-      <small>Average grade</small>
-      <b>{% if average_grade %}{{ average_grade|floatformat:1 }}{% else %}—{% endif %}</b>
-      <em>{% if grade_count %}Across {{ grade_count }} result{{ grade_count|pluralize }}{% else %}No grades yet{% endif %}</em>
-    </article>
-    <article class="stat-card">
-      <small>Amount paid</small>
-      <b>{{ student.paid_amount }}</b>
-      <em>Of {{ course_total }} total course fees</em>
-    </article>
-    <article class="stat-card {% if balance_due > 0 %}stat-card-warning{% elif balance_due < 0 %}stat-card-success{% endif %}">
-      <small>Balance</small>
-      <b>{{ balance_due }}</b>
-      <em>{% if balance_due > 0 %}Outstanding{% elif balance_due < 0 %}Credit on account{% else %}Fully settled{% endif %}</em>
-    </article>
-  </section>
+    <section class="stat-grid profile-stat-grid" aria-label="Study summary">
+      <article class="stat-card">
+        <small>Active groups</small>
+        <b>{{ groups|length }}</b>
+        <em>Courses you are enrolled in</em>
+      </article>
+      <article class="stat-card">
+        <small>Average grade</small>
+        <b>{% if average_grade %}{{ average_grade|floatformat:1 }}{% else %}—{% endif %}</b>
+        <em>{% if grade_count %}Across {{ grade_count }} result{{ grade_count|pluralize }}{% else %}No grades yet{% endif %}</em>
+      </article>
+      <article class="stat-card">
+        <small>Amount paid</small>
+        <b>{{ student.paid_amount }}</b>
+        <em>Of {{ course_total }} total course fees</em>
+      </article>
+      <article class="stat-card {% if balance_due > 0 %}stat-card-warning{% elif balance_due < 0 %}stat-card-success{% endif %}">
+        <small>Balance</small>
+        <b>{{ balance_due }}</b>
+        <em>{% if balance_due > 0 %}Outstanding{% elif balance_due < 0 %}Credit on account{% else %}Fully settled{% endif %}</em>
+      </article>
+    </section>
+  </div>
 
   <div class="dashboard-grid">
     <section class="panel" aria-labelledby="account-heading">
@@ -52,24 +75,96 @@
           <h2 id="account-heading">Account details</h2>
         </div>
       </div>
-      <dl class="detail-list">
-        <div>
-          <dt>First name</dt>
-          <dd>{{ student.user.first_name }}</dd>
+
+      <form class="crm-form" method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="form-errors" role="alert">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="field-grid">
+          <div class="field {% if form.first_name.errors %}has-error{% endif %}">
+            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+            {{ form.first_name }}
+            {% for error in form.first_name.errors %}
+              <p class="field-error">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <div class="field {% if form.last_name.errors %}has-error{% endif %}">
+            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+            {% for error in form.last_name.errors %}
+              <p class="field-error">{{ error }}</p>
+            {% endfor %}
+          </div>
         </div>
-        <div>
-          <dt>Last name</dt>
-          <dd>{{ student.user.last_name }}</dd>
+
+        <div class="field {% if form.email.errors %}has-error{% endif %}">
+          <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+          {{ form.email }}
+          {% for error in form.email.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
         </div>
-        <div>
-          <dt>Email</dt>
-          <dd>{{ student.user.email }}</dd>
+
+        <div class="field {% if form.phone.errors %}has-error{% endif %}">
+          <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+          {{ form.phone }}
+          {% for error in form.phone.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
         </div>
-        <div>
-          <dt>Phone</dt>
-          <dd>{{ student.user.phone }}</dd>
+
+        <div class="field {% if form.profile_picture.errors %}has-error{% endif %}">
+          <span class="field-label">{{ form.profile_picture.label }}</span>
+          <div
+            class="profile-upload{% if form.profile_picture.errors %} has-error{% endif %}"
+            data-profile-dropzone
+          >
+            <div class="profile-upload-preview" data-profile-preview>
+              {% if student.user.profile_picture %}
+                <img
+                  src="{{ student.user.profile_picture.url }}"
+                  alt="Current profile picture"
+                  data-profile-preview-image
+                >
+              {% else %}
+                <span class="profile-upload-initials" data-profile-preview-initials aria-hidden="true">
+                  {{ student.user.first_name|slice:":1" }}{{ student.user.last_name|slice:":1" }}
+                </span>
+              {% endif %}
+            </div>
+            <div class="profile-upload-copy">
+              <p class="profile-upload-title">Drag and drop a photo here</p>
+              <p class="profile-upload-hint">JPEG, PNG, WebP or GIF · up to 5 MB</p>
+              <label class="btn btn-ghost btn-sm profile-upload-browse" for="{{ form.profile_picture.id_for_label }}">
+                Choose file
+              </label>
+              <p class="profile-upload-filename" data-profile-filename>
+                {% if student.user.profile_picture %}
+                  {{ student.user.profile_picture.name|cut:"profile_pictures/" }}
+                {% else %}
+                  No file selected
+                {% endif %}
+              </p>
+            </div>
+            {{ form.profile_picture }}
+          </div>
+          {% for error in form.profile_picture.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
         </div>
-      </dl>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
     </section>
 
     <section class="panel" aria-labelledby="enrolment-heading">
