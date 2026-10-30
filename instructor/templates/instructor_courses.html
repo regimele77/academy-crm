@@ -1,0 +1,103 @@
+{% extends "instructor_base.html" %}
+
+{% block title %}Courses · Instructor · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Catalogue</p>
+  <h1>My courses</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="stat-grid" aria-label="Courses at a glance">
+    <article class="stat-card">
+      <small>Courses</small>
+      <b>{{ course_count }}</b>
+      <em>Assigned to you</em>
+    </article>
+    <article class="stat-card">
+      <small>Your groups</small>
+      <b>{{ total_groups }}</b>
+      <em>On these courses</em>
+    </article>
+    <article class="stat-card">
+      <small>Active groups</small>
+      <b>{{ active_groups_count }}</b>
+      <em>Running now</em>
+    </article>
+    <article class="stat-card">
+      <small>Students</small>
+      <b>{{ total_students }}</b>
+      <em>In your groups</em>
+    </article>
+  </section>
+
+  <section class="panel" aria-labelledby="courses-list-heading">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Assigned</p>
+        <h2 id="courses-list-heading">Course catalogue</h2>
+      </div>
+      <div class="panel-header-actions">
+        <span class="panel-meta">{{ course_count }} course{{ course_count|pluralize }}</span>
+        <a class="btn btn-primary btn-sm" href="{% url 'instructor_create_course' %}">
+          <i class="fa fa-plus" aria-hidden="true"></i>
+          New course
+        </a>
+      </div>
+    </div>
+
+    {% if courses %}
+      <ul class="data-list">
+        {% for course in courses %}
+          <li
+            class="data-row data-row-stacked{% if course.instructor_id == instructor.pk %} data-row-clickable{% endif %}"
+            {% if course.instructor_id == instructor.pk %}
+              data-row-href="{% url 'instructor_edit_course' course.id %}"
+              role="link"
+              tabindex="0"
+              aria-label="Edit course {{ course.name }}"
+            {% endif %}
+          >
+            <div class="data-main">
+              <strong>{{ course.name }}</strong>
+              <small>
+                {% if course.description %}{{ course.description|truncatechars:140 }}{% else %}No description{% endif %}
+              </small>
+              {% if course.own_groups %}
+                <ul class="nested-list">
+                  {% for group in course.own_groups %}
+                    <li
+                      class="nested-row-clickable"
+                      data-row-href="{% url 'instructor_edit_group' group.id %}"
+                      role="link"
+                      tabindex="0"
+                      aria-label="Edit group {{ group.name }}"
+                    >
+                      <span>{{ group.name }}</span>
+                      <span>{{ group.student_count }} student{{ group.student_count|pluralize }} · {{ group.start_date|date:"j M Y" }} – {{ group.end_date|date:"j M Y" }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <small class="nested-empty">No groups you lead on this course yet.</small>
+              {% endif %}
+            </div>
+            <div class="data-meta">
+              <em>{{ course.price }}</em>
+              <span>{{ course.own_group_count }} group{{ course.own_group_count|pluralize }} · {{ course.own_student_count }} student{{ course.own_student_count|pluralize }}</span>
+              {% if course.instructor_id == instructor.pk %}
+                <div class="row-actions" data-no-row-nav>
+                  <a class="btn btn-ghost btn-sm" href="{% url 'instructor_edit_course' course.id %}">Edit</a>
+                  <a class="btn btn-danger-ghost btn-sm" href="{% url 'instructor_delete_course' course.id %}">Delete</a>
+                </div>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty-state">You are not assigned to any courses yet.</p>
+      <a class="btn btn-primary" href="{% url 'instructor_create_course' %}">Create your first course</a>
+    {% endif %}
+  </section>
+{% endblock %}

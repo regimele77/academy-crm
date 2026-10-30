@@ -10,8 +10,13 @@ def user_login(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            messages.success(request, 'Welcome back, {user.first_name}!')
-            return redirect('home')
+            messages.success(request, f'Welcome back, {user.first_name}!')
+            if user.is_student:
+                return redirect('student_dashboard')
+            elif user.is_instructor:
+                return redirect('instructor_dashboard')
+            else:
+                return redirect('home')
         messages.error(request, 'Invalid email or password')
     return render(request, 'login.html')
 

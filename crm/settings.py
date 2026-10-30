@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'authentication',
     'course',
     'student',
-    'instructor'
+    'instructor',
+    'administration'
 ]
 
 MIDDLEWARE = [
@@ -104,6 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = 'authentication.CRMUserModel'
+LOGIN_URL = 'login'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
@@ -129,5 +131,11 @@ STATIC_URL = '/static/'
 MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'EMAIL_HOST': 'smtp.gmail.com',
+        'EMAIL_PORT': 587,
+        'EMAIL_HOST_USER': 'regimele77@gmail.com',
+        'EMAIL_HOST_PASSWORD': 'igst htyj vjdi zqed',
+        'EMAIL_USE_TLS': True,
+        'EMAIL_USE_SSL': False,
     },
 }

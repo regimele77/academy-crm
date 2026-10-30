@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#086288">
+  <title>{% block title %}Student · Academy CRM{% endblock %}</title>
+  <link rel="icon" href="{% static 'web/logo.jpg' %}" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{% static 'student/css/student.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="student-app">
+  <a class="skip-link" href="#student-content">Skip to content</a>
+
+  <div class="student-shell">
+    <aside class="student-sidebar" id="student-sidebar" aria-label="Student navigation">
+      <div class="sidebar-brand">
+        <img src="{% static 'web/logo.jpg' %}" alt="" width="40" height="40">
+        <div>
+          <strong>Academy CRM</strong>
+          <span>Student portal</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Quick panels">
+        <p class="sidebar-label">Quick panels</p>
+        <a
+          class="sidebar-link {% if active_nav == 'dashboard' %}is-active{% endif %}"
+          href="{% url 'student_dashboard' %}"
+          {% if active_nav == 'dashboard' %}aria-current="page"{% endif %}
+        >
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-home"></i></span>
+          Dashboard
+        </a>
+        <a class="sidebar-link" href="{% url 'student_dashboard' %}#my-groups">
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
+          My groups
+        </a>
+        <a class="sidebar-link" href="{% url 'student_dashboard' %}#my-grades">
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-star"></i></span>
+          My grades
+        </a>
+        <a class="sidebar-link" href="{% url 'student_dashboard' %}#payments">
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-credit-card"></i></span>
+          Payments
+        </a>
+        <a
+          class="sidebar-link {% if active_nav == 'profile' %}is-active{% endif %}"
+          href="{% url 'student_profile' %}"
+          {% if active_nav == 'profile' %}aria-current="page"{% endif %}
+        >
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-user"></i></span>
+          Profile
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <span class="sidebar-avatar" aria-hidden="true">
+            {{ request.student.user.first_name|slice:":1" }}{{ request.student.user.last_name|slice:":1" }}
+          </span>
+          <div>
+            <strong>{{ request.student.user.first_name }} {{ request.student.user.last_name }}</strong>
+            <span>{{ request.student.register_number }}</span>
+          </div>
+        </div>
+        <a class="sidebar-link sidebar-logout" href="{% url 'logout' %}">
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-sign-out"></i></span>
+          Log out
+        </a>
+      </div>
+    </aside>
+
+    <div class="student-main">
+      <header class="student-topbar">
+        <button
+          class="sidebar-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="student-sidebar"
+          data-sidebar-toggle
+        >
+          <span class="sr-only">Menu</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <div class="topbar-copy">
+          {% block topbar %}
+            <p class="eyebrow">Student workspace</p>
+            <h1>Overview</h1>
+          {% endblock %}
+        </div>
+      </header>
+
+      {% if messages %}
+        <div class="student-messages" role="status">
+          {% for message in messages %}
+            <p class="notice {% if message.tags == 'error' %}notice-error{% endif %}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <main id="student-content" class="student-content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <div class="sidebar-backdrop" data-sidebar-backdrop hidden></div>
+  <script src="{% static 'student/js/student.js' %}"></script>
+  {% block extra_body %}{% endblock %}
+</body>
+</html>

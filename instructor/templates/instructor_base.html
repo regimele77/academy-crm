@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#086288">
+  <title>{% block title %}Instructor · Academy CRM{% endblock %}</title>
+  <link rel="icon" href="{% static 'web/logo.jpg' %}" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{% static 'instructor/css/instructor.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="instructor-app">
+  <a class="skip-link" href="#instructor-content">Skip to content</a>
+
+  <div class="instructor-shell">
+    <aside class="instructor-sidebar" id="instructor-sidebar" aria-label="Instructor navigation">
+      <div class="sidebar-brand">
+        <img src="{% static 'web/logo.jpg' %}" alt="" width="40" height="40">
+        <div>
+          <strong>Academy CRM</strong>
+          <span>Instructor portal</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Quick panels">
+        <p class="sidebar-label">Quick panels</p>
+        <a
+          class="sidebar-link {% if active_nav == 'dashboard' %}is-active{% endif %}"
+          href="{% url 'instructor_dashboard' %}"
+          {% if active_nav == 'dashboard' %}aria-current="page"{% endif %}
+        >
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-home"></i></span>
+          Dashboard
+        </a>
+        <a
+          class="sidebar-link {% if active_nav == 'courses' %}is-active{% endif %}"
+          href="{% url 'instructor_courses' %}"
+          {% if active_nav == 'courses' %}aria-current="page"{% endif %}
+        >
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-book"></i></span>
+          My courses
+        </a>
+        <a
+          class="sidebar-link {% if active_nav == 'groups' %}is-active{% endif %}"
+          href="{% url 'instructor_groups' %}"
+          {% if active_nav == 'groups' %}aria-current="page"{% endif %}
+        >
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
+          My groups
+        </a>
+        <a class="sidebar-link" href="{% url 'instructor_dashboard' %}#recent-grades">
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-star"></i></span>
+          Recent grades
+        </a>
+        <a
+          class="sidebar-link {% if active_nav == 'profile' %}is-active{% endif %}"
+          href="{% url 'instructor_profile' %}"
+          {% if active_nav == 'profile' %}aria-current="page"{% endif %}
+        >
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-user"></i></span>
+          Profile
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <span class="sidebar-avatar" aria-hidden="true">
+            {{ request.instructor.user.first_name|slice:":1" }}{{ request.instructor.user.last_name|slice:":1" }}
+          </span>
+          <div>
+            <strong>{{ request.instructor.user.first_name }} {{ request.instructor.user.last_name }}</strong>
+            <span>Instructor</span>
+          </div>
+        </div>
+        <a class="sidebar-link sidebar-logout" href="{% url 'logout' %}">
+          <span class="sidebar-icon" aria-hidden="true"><i class="fa fa-sign-out"></i></span>
+          Log out
+        </a>
+      </div>
+    </aside>
+
+    <div class="instructor-main">
+      <header class="instructor-topbar">
+        <button
+          class="sidebar-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="instructor-sidebar"
+          data-sidebar-toggle
+        >
+          <span class="sr-only">Menu</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <div class="topbar-copy">
+          {% block topbar %}
+            <p class="eyebrow">Instructor workspace</p>
+            <h1>Overview</h1>
+          {% endblock %}
+        </div>
+      </header>
+
+      {% if messages %}
+        <div class="instructor-messages" role="status">
+          {% for message in messages %}
+            <p class="notice {% if message.tags == 'error' %}notice-error{% endif %}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <main id="instructor-content" class="instructor-content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <div class="sidebar-backdrop" data-sidebar-backdrop hidden></div>
+  <script src="{% static 'instructor/js/instructor.js' %}"></script>
+  {% block extra_body %}{% endblock %}
+</body>
+</html>

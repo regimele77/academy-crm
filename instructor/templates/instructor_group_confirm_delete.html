@@ -1,0 +1,58 @@
+{% extends "instructor_base.html" %}
+
+{% block title %}Delete group · Instructor · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Delivery</p>
+  <h1>Delete group</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="panel form-panel" aria-labelledby="delete-group-heading">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Confirm</p>
+        <h2 id="delete-group-heading">Remove “{{ group.name }}”?</h2>
+      </div>
+      <a class="panel-meta panel-link" href="{% url 'instructor_groups' %}">Back to groups</a>
+    </div>
+
+    <p class="confirm-copy">
+      This permanently deletes the group
+      {% if student_count or grade_count %}
+        and clears
+        {% if student_count %}{{ student_count }} enrolment{{ student_count|pluralize }}{% endif %}
+        {% if student_count and grade_count %} and {% endif %}
+        {% if grade_count %}{{ grade_count }} grade{{ grade_count|pluralize }}{% endif %}
+      {% endif %}
+      . Other instructors’ groups are not affected.
+    </p>
+
+    <dl class="detail-list">
+      <div>
+        <dt>Group</dt>
+        <dd>{{ group.name }}</dd>
+      </div>
+      <div>
+        <dt>Course</dt>
+        <dd>{{ group.course.name }}</dd>
+      </div>
+      <div>
+        <dt>Dates</dt>
+        <dd>{{ group.start_date|date:"j M Y" }} – {{ group.end_date|date:"j M Y" }}</dd>
+      </div>
+      <div>
+        <dt>Students</dt>
+        <dd>{{ student_count }}</dd>
+      </div>
+    </dl>
+
+    <form class="crm-form" method="post">
+      {% csrf_token %}
+      <div class="form-actions">
+        <button class="btn btn-danger" type="submit">Delete group</button>
+        <a class="btn btn-ghost" href="{% url 'instructor_groups' %}">Cancel</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends "instructor_base.html" %}
+
+{% block title %}{% if form_mode == 'edit' %}Edit group{% else %}New group{% endif %} · Instructor · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Delivery</p>
+  <h1>{% if form_mode == 'edit' %}Edit group{% else %}New group{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+  <div class="form-layout {% if form_mode == 'edit' %}form-layout-split{% endif %}">
+    <section class="panel form-panel" aria-labelledby="group-form-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">{% if form_mode == 'edit' %}Update{% else %}Create{% endif %}</p>
+          <h2 id="group-form-heading">{% if form_mode == 'edit' %}{{ group.name }}{% else %}Group details{% endif %}</h2>
+        </div>
+        <a class="panel-meta panel-link" href="{% url 'instructor_groups' %}">Back to groups</a>
+      </div>
+
+      <form class="crm-form" method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="form-errors" role="alert">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="field {% if form.name.errors %}has-error{% endif %}">
+          <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+          {{ form.name }}
+          {% for error in form.name.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="field {% if form.course.errors %}has-error{% endif %}">
+          <label for="{{ form.course.id_for_label }}">{{ form.course.label }}</label>
+          {{ form.course }}
+          {% for error in form.course.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="field-grid">
+          <div class="field {% if form.start_date.errors %}has-error{% endif %}">
+            <label for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}</label>
+            {{ form.start_date }}
+            {% for error in form.start_date.errors %}
+              <p class="field-error">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <div class="field {% if form.end_date.errors %}has-error{% endif %}">
+            <label for="{{ form.end_date.id_for_label }}">{{ form.end_date.label }}</label>
+            {{ form.end_date }}
+            {% for error in form.end_date.errors %}
+              <p class="field-error">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">
+            {% if form_mode == 'edit' %}Save changes{% else %}Create group{% endif %}
+          </button>
+          <a class="btn btn-ghost" href="{% url 'instructor_groups' %}">Cancel</a>
+        </div>
+      </form>
+    </section>
+
+    {% if form_mode == 'edit' %}
+      <aside class="panel related-panel" aria-labelledby="group-students-heading">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Enrolment</p>
+            <h2 id="group-students-heading">Students in this group</h2>
+          </div>
+          <div class="panel-header-actions">
+            <span class="panel-meta">{{ related_students|length }} student{{ related_students|length|pluralize }}</span>
+            <button
+              class="btn btn-primary btn-sm"
+              type="button"
+              data-modal-open="add-student-modal"
+            >
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              Add student
+            </button>
+          </div>
+        </div>
+
+        {% if related_students %}
+          <ul class="data-list">
+            {% for student in related_students %}
+              <li class="data-row">
+                <div class="data-main">
+                  <strong>{{ student.user.first_name }} {{ student.user.last_name }}</strong>
+                  <small>
+                    {{ student.register_number }}
+                    · {{ student.user.email }}
+                  </small>
+                </div>
+                <div class="data-meta">
+                  {% if student.group_grade %}
+                    <div class="grade-pill" aria-label="Grade {{ student.group_grade.grade }}">
+                      {{ student.group_grade.grade|floatformat:1 }}
+                    </div>
+                  {% else %}
+                    <span class="panel-meta">No grade</span>
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty-state">No students are enrolled in this group yet.</p>
+        {% endif %}
+      </aside>
+    {% endif %}
+  </div>
+
+  {% if form_mode == 'edit' %}
+    <div
+      class="modal"
+      id="add-student-modal"
+      hidden
+      data-modal
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-student-modal-title"
+    >
+      <div class="modal-backdrop" data-modal-close></div>
+      <div class="modal-dialog" role="document">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Enrolment</p>
+            <h2 id="add-student-modal-title">Add student to {{ group.name }}</h2>
+          </div>
+          <button class="modal-close" type="button" aria-label="Close" data-modal-close>
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="modal-search">
+          <label class="sr-only" for="student-search">Search students</label>
+          <div class="modal-search-field">
+            <span class="modal-search-icon" aria-hidden="true">
+              <i class="fa fa-search"></i>
+            </span>
+            <input
+              id="student-search"
+              class="modal-search-input"
+              type="search"
+              placeholder="Search by name or register number"
+              autocomplete="off"
+              data-student-search
+            >
+          </div>
+        </div>
+
+        <div class="modal-body">
+          {% if available_students %}
+            <ul class="data-list modal-student-list" data-student-list>
+              {% for student in available_students %}
+                <li
+                  class="data-row"
+                  data-student-item
+                  data-search="{{ student.user.first_name }} {{ student.user.last_name }} {{ student.register_number }}"
+                >
+                  <div class="data-main">
+                    <strong>{{ student.user.first_name }} {{ student.user.last_name }}</strong>
+                    <small>{{ student.register_number }}</small>
+                  </div>
+                  <div class="data-meta">
+                    <form method="post" action="{% url 'instructor_add_group_student' group.id %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="student_id" value="{{ student.id }}">
+                      <button class="btn btn-primary btn-sm" type="submit">Add</button>
+                    </form>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+            <p class="empty-state modal-empty" data-student-empty hidden>No students match your search.</p>
+          {% else %}
+            <p class="empty-state">Every academy student is already in this group.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "instructor_base.html" %}
+
+{% block title %}Groups · Instructor · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Delivery</p>
+  <h1>My groups</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="stat-grid" aria-label="Groups at a glance">
+    <article class="stat-card">
+      <small>Total groups</small>
+      <b>{{ group_count }}</b>
+      <em>Led by you only</em>
+    </article>
+    <article class="stat-card">
+      <small>Active</small>
+      <b>{{ active_count }}</b>
+      <em>In session now</em>
+    </article>
+    <article class="stat-card">
+      <small>Upcoming</small>
+      <b>{{ upcoming_count }}</b>
+      <em>Not started yet</em>
+    </article>
+    <article class="stat-card">
+      <small>Students</small>
+      <b>{{ enrolled_students_count }}</b>
+      <em>Across your groups</em>
+    </article>
+  </section>
+
+  <section class="panel" aria-labelledby="groups-list-heading">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Your cohorts</p>
+        <h2 id="groups-list-heading">Group roster</h2>
+      </div>
+      <div class="panel-header-actions">
+        <span class="panel-meta">{{ group_count }} group{{ group_count|pluralize }} · {{ ended_count }} ended</span>
+        <a class="btn btn-primary btn-sm" href="{% url 'instructor_create_group' %}">
+          <i class="fa fa-plus" aria-hidden="true"></i>
+          New group
+        </a>
+      </div>
+    </div>
+
+    {% if groups %}
+      <ul class="data-list">
+        {% for group in groups %}
+          <li
+            class="data-row data-row-clickable"
+            data-row-href="{% url 'instructor_edit_group' group.id %}"
+            role="link"
+            tabindex="0"
+            aria-label="Edit group {{ group.name }}"
+          >
+            <div class="data-main">
+              <strong>{{ group.name }}</strong>
+              <small>{{ group.course.name }} · {{ group.student_count }} student{{ group.student_count|pluralize }}</small>
+            </div>
+            <div class="data-meta">
+              <span class="status-pill status-{{ group.status }}">{{ group.status|title }}</span>
+              <span>{{ group.start_date|date:"j M Y" }} – {{ group.end_date|date:"j M Y" }}</span>
+              <em>{{ group.course.price }}</em>
+              <div class="row-actions" data-no-row-nav>
+                <a class="btn btn-ghost btn-sm" href="{% url 'instructor_edit_group' group.id %}">Edit</a>
+                <a class="btn btn-danger-ghost btn-sm" href="{% url 'instructor_delete_group' group.id %}">Delete</a>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty-state">You do not lead any groups yet. Only groups assigned to you appear here.</p>
+      <a class="btn btn-primary" href="{% url 'instructor_create_group' %}">Create your first group</a>
+    {% endif %}
+  </section>
+{% endblock %}

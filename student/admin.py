@@ -12,5 +12,5 @@ class StudentModelAdmin(admin.ModelAdmin):
 class StudentGradeModelAdmin(admin.ModelAdmin):
     list_display = ['student', 'group', 'grade']
     list_filter = ['group']
-    search_fields = ['student__user__first_name', 'student__user__last_name', 'group__name']
+    search_fields = ['student__first_name', 'student__last_name', 'group__name']
     list_per_page = 10

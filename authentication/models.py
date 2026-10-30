@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from student.models import StudentModel
+from instructor.models import InstructorModel
 
 class CRMUserModel(AbstractUser):
     email = models.EmailField(unique=True)
@@ -23,3 +24,11 @@ class CRMUserModel(AbstractUser):
     def save(self, *args, **kwargs):
         self.username = self.email
         super().save(*args, **kwargs)
+    
+    @property
+    def is_student(self):
+        return StudentModel.objects.filter(user=self).exists()
+
+    @property
+    def is_instructor(self):
+        return InstructorModel.objects.filter(user=self).exists()

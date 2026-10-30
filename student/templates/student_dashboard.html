@@ -1,0 +1,149 @@
+{% extends "student_base.html" %}
+
+{% block title %}Dashboard · Student · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Your academy overview</p>
+  <h1>Good to see you, {{ student.user.first_name }}.</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="stat-grid" aria-label="At a glance">
+    <article class="stat-card">
+      <small>Active groups</small>
+      <b>{{ groups|length }}</b>
+      <em>Courses you are enrolled in</em>
+    </article>
+    <article class="stat-card">
+      <small>Average grade</small>
+      <b>{% if average_grade %}{{ average_grade|floatformat:1 }}{% else %}—{% endif %}</b>
+      <em>{% if grade_count %}Across {{ grade_count }} result{{ grade_count|pluralize }}{% else %}No grades yet{% endif %}</em>
+    </article>
+    <article class="stat-card">
+      <small>Amount paid</small>
+      <b>{{ student.paid_amount }}</b>
+      <em>Of {{ course_total }} total course fees</em>
+    </article>
+    <article class="stat-card {% if balance_due > 0 %}stat-card-warning{% elif balance_due < 0 %}stat-card-success{% endif %}">
+      <small>Balance</small>
+      <b>{{ balance_due }}</b>
+      <em>{% if balance_due > 0 %}Outstanding{% elif balance_due < 0 %}Credit on account{% else %}Fully settled{% endif %}</em>
+    </article>
+  </section>
+
+  <div class="dashboard-grid">
+    <section class="panel" id="my-groups" aria-labelledby="groups-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Enrolment</p>
+          <h2 id="groups-heading">My groups</h2>
+        </div>
+        <span class="panel-meta">{{ groups|length }} active</span>
+      </div>
+
+      {% if groups %}
+        <ul class="data-list">
+          {% for group in groups %}
+            <li class="data-row">
+              <div class="data-main">
+                <strong>{{ group.name }}</strong>
+                <small>{{ group.course.name }} · {{ group.instructor.user.first_name }} {{ group.instructor.user.last_name }}</small>
+              </div>
+              <div class="data-meta">
+                <span>{{ group.start_date|date:"j M Y" }} – {{ group.end_date|date:"j M Y" }}</span>
+                <em>{{ group.course.price }}</em>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">You are not enrolled in any groups yet. Your academy will add you when a place opens.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel" id="my-grades" aria-labelledby="grades-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Progress</p>
+          <h2 id="grades-heading">Recent grades</h2>
+        </div>
+        <span class="panel-meta">Latest updates</span>
+      </div>
+
+      {% if recent_grades %}
+        <ul class="data-list">
+          {% for item in recent_grades %}
+            <li class="data-row">
+              <div class="data-main">
+                <strong>{{ item.group.name }}</strong>
+                <small>{{ item.group.course.name }} · Updated {{ item.updated_at|date:"j M Y" }}</small>
+              </div>
+              <div class="grade-pill" aria-label="Grade {{ item.grade }}">
+                {{ item.grade|floatformat:1 }}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">No grades have been recorded for you yet.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="dashboard-grid dashboard-grid-secondary">
+    <section class="panel" id="payments" aria-labelledby="payments-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Fees</p>
+          <h2 id="payments-heading">Payments</h2>
+        </div>
+      </div>
+      <dl class="detail-list">
+        <div>
+          <dt>Register number</dt>
+          <dd>{{ student.register_number }}</dd>
+        </div>
+        <div>
+          <dt>Total course fees</dt>
+          <dd>{{ course_total }}</dd>
+        </div>
+        <div>
+          <dt>Paid to date</dt>
+          <dd>{{ student.paid_amount }}</dd>
+        </div>
+        <div>
+          <dt>Balance</dt>
+          <dd class="{% if balance_due > 0 %}text-warning{% elif balance_due < 0 %}text-success{% endif %}">{{ balance_due }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="panel" id="profile" aria-labelledby="profile-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Account</p>
+          <h2 id="profile-heading">Profile</h2>
+        </div>
+        <a class="panel-meta panel-link" href="{% url 'student_profile' %}">View full profile</a>
+      </div>
+      <dl class="detail-list">
+        <div>
+          <dt>Name</dt>
+          <dd>{{ student.user.first_name }} {{ student.user.last_name }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ student.user.email }}</dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd>{{ student.user.phone }}</dd>
+        </div>
+        <div>
+          <dt>Member since</dt>
+          <dd>{{ student.created_at|date:"j M Y" }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "instructor_base.html" %}
+
+{% block title %}Delete course · Instructor · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Catalogue</p>
+  <h1>Delete course</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="panel form-panel" aria-labelledby="delete-course-heading">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">{% if can_delete_course %}Confirm{% else %}Blocked{% endif %}</p>
+        <h2 id="delete-course-heading">
+          {% if can_delete_course %}
+            Remove “{{ course.name }}”?
+          {% else %}
+            Cannot delete “{{ course.name }}” yet
+          {% endif %}
+        </h2>
+      </div>
+      <a class="panel-meta panel-link" href="{% url 'instructor_courses' %}">Back to courses</a>
+    </div>
+
+    {% if can_delete_course %}
+      <p class="confirm-copy">
+        This permanently deletes the course. No groups remain on it.
+      </p>
+
+      <dl class="detail-list">
+        <div>
+          <dt>Course</dt>
+          <dd>{{ course.name }}</dd>
+        </div>
+        <div>
+          <dt>Price</dt>
+          <dd>{{ course.price }}</dd>
+        </div>
+      </dl>
+
+      <form class="crm-form" method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+          <button class="btn btn-danger" type="submit">Delete course</button>
+          <a class="btn btn-ghost" href="{% url 'instructor_courses' %}">Cancel</a>
+        </div>
+      </form>
+    {% else %}
+      <p class="confirm-copy">
+        {% if group_count %}
+          Delete the {{ group_count }} group{{ group_count|pluralize }} below first.
+          After they are gone, you can remove this course.
+        {% else %}
+          This course still has {{ other_groups_count }} group{{ other_groups_count|pluralize }}
+          led by other instructors. Those must be removed before you can delete the course.
+        {% endif %}
+      </p>
+
+      {% if blocking_groups %}
+        <ul class="data-list blocking-groups">
+          {% for group in blocking_groups %}
+            <li class="data-row">
+              <div class="data-main">
+                <strong>{{ group.name }}</strong>
+                <small>
+                  {{ group.start_date|date:"j M Y" }} – {{ group.end_date|date:"j M Y" }}
+                  · {{ group.student_count }} student{{ group.student_count|pluralize }}
+                </small>
+              </div>
+              <div class="data-meta">
+                <a class="btn btn-danger-ghost btn-sm" href="{% url 'instructor_delete_group' group.id %}">
+                  Delete group
+                </a>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% if other_groups_count and group_count %}
+        <p class="confirm-copy">
+          There {{ other_groups_count|pluralize:"is,are" }} also
+          {{ other_groups_count }} other group{{ other_groups_count|pluralize }}
+          on this course that you do not lead.
+        </p>
+      {% endif %}
+
+      <div class="form-actions">
+        <a class="btn btn-ghost" href="{% url 'instructor_courses' %}">Back to courses</a>
+        {% if group_count %}
+          <a class="btn btn-primary" href="{% url 'instructor_groups' %}">Go to my groups</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

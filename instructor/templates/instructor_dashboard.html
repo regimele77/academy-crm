@@ -1,0 +1,173 @@
+{% extends "instructor_base.html" %}
+
+{% block title %}Dashboard · Instructor · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Your teaching overview</p>
+  <h1>Good to see you, {{ instructor.user.first_name }}.</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="stat-grid" aria-label="At a glance">
+    <article class="stat-card">
+      <small>Courses</small>
+      <b>{{ course_count }}</b>
+      <em>Assigned to you</em>
+    </article>
+    <article class="stat-card">
+      <small>Active groups</small>
+      <b>{{ active_groups_count }}</b>
+      <em>{% if groups %}{{ groups|length }} group{{ groups|length|pluralize }} total{% else %}No groups yet{% endif %}</em>
+    </article>
+    <article class="stat-card">
+      <small>Enrolled students</small>
+      <b>{{ enrolled_students_count }}</b>
+      <em>Distinct across your groups</em>
+    </article>
+    <article class="stat-card">
+      <small>Grade activity</small>
+      <b>{{ recent_grade_activity }}</b>
+      <em>Updated in the last 30 days</em>
+    </article>
+  </section>
+
+  <div class="dashboard-grid">
+    <section class="panel" id="my-courses" aria-labelledby="courses-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Catalogue</p>
+          <h2 id="courses-heading">My courses</h2>
+        </div>
+        <span class="panel-meta">{{ course_count }} assigned</span>
+      </div>
+
+      {% if courses %}
+        <ul class="data-list">
+          {% for course in courses %}
+            <li
+              class="data-row{% if course.instructor_id == instructor.pk %} data-row-clickable{% endif %}"
+              {% if course.instructor_id == instructor.pk %}
+                data-row-href="{% url 'instructor_edit_course' course.id %}"
+                role="link"
+                tabindex="0"
+                aria-label="Edit course {{ course.name }}"
+              {% endif %}
+            >
+              <div class="data-main">
+                <strong>{{ course.name }}</strong>
+                <small>{% if course.description %}{{ course.description|truncatechars:90 }}{% else %}No description{% endif %}</small>
+              </div>
+              <div class="data-meta">
+                <em>{{ course.price }}</em>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">You are not assigned to any courses yet.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel" id="my-groups" aria-labelledby="groups-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Delivery</p>
+          <h2 id="groups-heading">My groups</h2>
+        </div>
+        <span class="panel-meta">{{ active_groups_count }} active</span>
+      </div>
+
+      {% if groups %}
+        <ul class="data-list">
+          {% for group in groups %}
+            <li
+              class="data-row data-row-clickable"
+              data-row-href="{% url 'instructor_edit_group' group.id %}"
+              role="link"
+              tabindex="0"
+              aria-label="Edit group {{ group.name }}"
+            >
+              <div class="data-main">
+                <strong>{{ group.name }}</strong>
+                <small>{{ group.course.name }} · {{ group.student_count }} student{{ group.student_count|pluralize }}</small>
+              </div>
+              <div class="data-meta">
+                <span>{{ group.start_date|date:"j M Y" }} – {{ group.end_date|date:"j M Y" }}</span>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">You do not lead any groups yet.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="dashboard-grid dashboard-grid-secondary">
+    <section class="panel" id="recent-grades" aria-labelledby="grades-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Assessment</p>
+          <h2 id="grades-heading">Recent grades</h2>
+        </div>
+        <span class="panel-meta">Latest in your groups</span>
+      </div>
+
+      {% if recent_grades %}
+        <ul class="data-list">
+          {% for item in recent_grades %}
+            <li class="data-row">
+              <div class="data-main">
+                <strong>{{ item.student.first_name }} {{ item.student.last_name }}</strong>
+                <small>{{ item.group.name }} · {{ item.group.course.name }} · {{ item.updated_at|date:"j M Y" }}</small>
+              </div>
+              <div class="grade-pill" aria-label="Grade {{ item.grade }}">
+                {{ item.grade|floatformat:1 }}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">No grades have been recorded in your groups yet.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel" id="profile" aria-labelledby="profile-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Account</p>
+          <h2 id="profile-heading">Profile</h2>
+        </div>
+        <a class="panel-meta panel-link" href="{% url 'instructor_profile' %}">View full profile</a>
+      </div>
+      <dl class="detail-list">
+        <div>
+          <dt>Name</dt>
+          <dd>{{ instructor.user.first_name }} {{ instructor.user.last_name }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ instructor.user.email }}</dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd>{{ instructor.user.phone }}</dd>
+        </div>
+        <div>
+          <dt>Salary</dt>
+          <dd>{{ instructor.salary }}</dd>
+        </div>
+        <div>
+          <dt>Member since</dt>
+          <dd>{{ instructor.created_at|date:"j M Y" }}</dd>
+        </div>
+        {% if instructor.description %}
+          <div>
+            <dt>About</dt>
+            <dd>{{ instructor.description }}</dd>
+          </div>
+        {% endif %}
+      </dl>
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "instructor_base.html" %}
+
+{% block title %}Profile · Instructor · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Account</p>
+  <h1>Your profile</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="panel profile-hero" aria-labelledby="profile-name">
+    <div class="profile-hero-main">
+      <span class="profile-avatar" aria-hidden="true">
+        {{ instructor.user.first_name|slice:":1" }}{{ instructor.user.last_name|slice:":1" }}
+      </span>
+      <div>
+        <p class="eyebrow">Instructor</p>
+        <h2 id="profile-name">{{ instructor.user.first_name }} {{ instructor.user.last_name }}</h2>
+        <p class="profile-subtitle">{{ instructor.user.email }}</p>
+      </div>
+    </div>
+    {% if instructor.description %}
+      <p class="profile-about">{{ instructor.description }}</p>
+    {% endif %}
+  </section>
+
+  <section class="stat-grid" aria-label="Teaching summary">
+    <article class="stat-card">
+      <small>Courses</small>
+      <b>{{ course_count }}</b>
+      <em>Assigned to you</em>
+    </article>
+    <article class="stat-card">
+      <small>Groups</small>
+      <b>{{ group_count }}</b>
+      <em>{{ active_groups_count }} active now</em>
+    </article>
+    <article class="stat-card">
+      <small>Students</small>
+      <b>{{ enrolled_students_count }}</b>
+      <em>Across your groups</em>
+    </article>
+    <article class="stat-card">
+      <small>Salary</small>
+      <b>{{ instructor.salary }}</b>
+      <em>Recorded on your account</em>
+    </article>
+  </section>
+
+  <div class="dashboard-grid">
+    <section class="panel" aria-labelledby="account-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2 id="account-heading">Account details</h2>
+        </div>
+      </div>
+      <dl class="detail-list">
+        <div>
+          <dt>First name</dt>
+          <dd>{{ instructor.user.first_name }}</dd>
+        </div>
+        <div>
+          <dt>Last name</dt>
+          <dd>{{ instructor.user.last_name }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ instructor.user.email }}</dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd>{{ instructor.user.phone }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="panel" aria-labelledby="employment-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Employment</p>
+          <h2 id="employment-heading">Instructor record</h2>
+        </div>
+      </div>
+      <dl class="detail-list">
+        <div>
+          <dt>Role</dt>
+          <dd>Instructor</dd>
+        </div>
+        <div>
+          <dt>Salary</dt>
+          <dd>{{ instructor.salary }}</dd>
+        </div>
+        <div>
+          <dt>Member since</dt>
+          <dd>{{ instructor.created_at|date:"j M Y" }}</dd>
+        </div>
+        <div>
+          <dt>Last updated</dt>
+          <dd>{{ instructor.updated_at|date:"j M Y" }}</dd>
+        </div>
+        {% if instructor.description %}
+          <div>
+            <dt>About</dt>
+            <dd>{{ instructor.description }}</dd>
+          </div>
+        {% endif %}
+      </dl>
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "student_base.html" %}
+
+{% block title %}Profile · Student · Academy CRM{% endblock %}
+
+{% block topbar %}
+  <p class="eyebrow">Account</p>
+  <h1>Your profile</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="panel profile-hero" aria-labelledby="profile-name">
+    <div class="profile-hero-main">
+      <span class="profile-avatar" aria-hidden="true">
+        {{ student.user.first_name|slice:":1" }}{{ student.user.last_name|slice:":1" }}
+      </span>
+      <div>
+        <p class="eyebrow">Student</p>
+        <h2 id="profile-name">{{ student.user.first_name }} {{ student.user.last_name }}</h2>
+        <p class="profile-subtitle">{{ student.register_number }} · {{ student.user.email }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stat-grid" aria-label="Study summary">
+    <article class="stat-card">
+      <small>Active groups</small>
+      <b>{{ groups|length }}</b>
+      <em>Courses you are enrolled in</em>
+    </article>
+    <article class="stat-card">
+      <small>Average grade</small>
+      <b>{% if average_grade %}{{ average_grade|floatformat:1 }}{% else %}—{% endif %}</b>
+      <em>{% if grade_count %}Across {{ grade_count }} result{{ grade_count|pluralize }}{% else %}No grades yet{% endif %}</em>
+    </article>
+    <article class="stat-card">
+      <small>Amount paid</small>
+      <b>{{ student.paid_amount }}</b>
+      <em>Of {{ course_total }} total course fees</em>
+    </article>
+    <article class="stat-card {% if balance_due > 0 %}stat-card-warning{% elif balance_due < 0 %}stat-card-success{% endif %}">
+      <small>Balance</small>
+      <b>{{ balance_due }}</b>
+      <em>{% if balance_due > 0 %}Outstanding{% elif balance_due < 0 %}Credit on account{% else %}Fully settled{% endif %}</em>
+    </article>
+  </section>
+
+  <div class="dashboard-grid">
+    <section class="panel" aria-labelledby="account-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2 id="account-heading">Account details</h2>
+        </div>
+      </div>
+      <dl class="detail-list">
+        <div>
+          <dt>First name</dt>
+          <dd>{{ student.user.first_name }}</dd>
+        </div>
+        <div>
+          <dt>Last name</dt>
+          <dd>{{ student.user.last_name }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ student.user.email }}</dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd>{{ student.user.phone }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="panel" aria-labelledby="enrolment-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Enrolment</p>
+          <h2 id="enrolment-heading">Student record</h2>
+        </div>
+      </div>
+      <dl class="detail-list">
+        <div>
+          <dt>Register number</dt>
+          <dd>{{ student.register_number }}</dd>
+        </div>
+        <div>
+          <dt>Total course fees</dt>
+          <dd>{{ course_total }}</dd>
+        </div>
+        <div>
+          <dt>Paid to date</dt>
+          <dd>{{ student.paid_amount }}</dd>
+        </div>
+        <div>
+          <dt>Balance</dt>
+          <dd class="{% if balance_due > 0 %}text-warning{% elif balance_due < 0 %}text-success{% endif %}">{{ balance_due }}</dd>
+        </div>
+        <div>
+          <dt>Member since</dt>
+          <dd>{{ student.created_at|date:"j M Y" }}</dd>
+        </div>
+        <div>
+          <dt>Last updated</dt>
+          <dd>{{ student.updated_at|date:"j M Y" }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+{% endblock %}
